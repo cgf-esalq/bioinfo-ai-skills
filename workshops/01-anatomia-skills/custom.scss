@@ -1,0 +1,169 @@
+/*-- scss:defaults --*/
+
+$font-family-sans-serif: 'Inter', 'Segoe UI', Roboto, sans-serif;
+$presentation-heading-font: 'Inter', 'Segoe UI', Roboto, sans-serif;
+$presentation-font-size-root: 36px;
+$presentation-heading-color: #2c3e50;
+$body-color: #333333;
+$link-color: #5b21b6;
+$code-block-bg: #f8f9fa;
+$code-color: #d63384;
+
+/*-- scss:rules --*/
+
+.reveal {
+  background-color: #ffffff;
+}
+
+.reveal .slide-background {
+  background-color: #ffffff;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  font-weight: 700;
+  text-transform: none;
+}
+
+.reveal h2 {
+  color: #5b21b6;
+  border-bottom: 2px solid #5b21b644;
+  padding-bottom: 0.3em;
+}
+
+.reveal code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85em;
+  color: #d63384;
+}
+
+.reveal pre {
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background-color: #f8f9fa;
+}
+
+.reveal pre code {
+  background: transparent;
+}
+
+/* Sobrescreve qualquer cor do highlight-style para garantir legibilidade */
+.reveal pre code span {
+  color: inherit;
+}
+
+.reveal table {
+  font-size: 0.8em;
+}
+
+.reveal table thead th {
+  background-color: #f8f9fa;
+  color: #5b21b6;
+  border-bottom: 2px solid #5b21b6;
+}
+
+.reveal table tbody td {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.reveal blockquote {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-left: 4px solid #5b21b6;
+  border-radius: 0 8px 8px 0;
+  padding: 1em 1.5em;
+  font-style: normal;
+  color: #495057;
+}
+
+.reveal .footer {
+  color: #adb5bd;
+  font-size: 0.5em;
+}
+
+.reveal section[data-background-color] h1,
+.reveal section[data-background-color] h2 {
+  color: #ffffff;
+  border-bottom: none;
+  font-size: 1.8em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.reveal .incremental li {
+  opacity: 0.3;
+}
+
+.reveal .incremental li.visible {
+  opacity: 1;
+}
+
+/* --- Roadmap / Timeline Style (Light Theme) --- */
+.roadmap {
+  list-style: none;
+  padding: 0;
+  margin: 1em 0;
+  position: relative;
+  counter-reset: roadmap-counter;
+}
+
+.roadmap::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 20px;
+  width: 4px;
+  background: #e9ecef; /* light line */
+}
+
+.roadmap > li {
+  position: relative;
+  padding-left: 85px;
+  margin-bottom: 45px;
+  list-style: none;
+  min-height: 48px;
+}
+
+/* Maintain visible opacity for fragments so we can see them */
+.roadmap > li.fragment {
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+.roadmap > li.fragment.visible {
+  opacity: 1;
+}
+
+.roadmap > li::before {
+  content: counter(roadmap-counter);
+  counter-increment: roadmap-counter;
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #7c3aed; /* vibrant purple fill */
+  color: #ffffff;
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 20px;
+  z-index: 1;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.roadmap h3 {
+  margin: 0 0 4px 0 !important;
+  font-size: 1.15em !important;
+  color: #2c3e50 !important; /* dark slate headers */
+  font-weight: 700;
+  line-height: 1.2 !important;
+}
+
+.roadmap p {
+  margin: 0 !important;
+  font-size: 0.88em !important;
+  color: #6c757d !important; /* light grey text */
+  line-height: 1.4 !important;
+}

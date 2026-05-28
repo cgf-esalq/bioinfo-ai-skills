@@ -1,0 +1,690 @@
+---
+title: "Anatomia de uma Skill e o Ecossistema de Tools"
+subtitle: "Workshop 1 — bioinfo-ai-skills"
+author: "CGF-ESALQ"
+date: today
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    preview-links: auto
+    transition: fade
+    code-line-numbers: true
+    highlight-style: github
+    footer: "🧬 bioinfo-ai-skills | WS1 — Anatomia de Skills"
+    logo: ""
+    embed-resources: true
+execute:
+  echo: true
+  eval: false
+---
+
+## Objetivo do Workshop {.smaller}
+
+Neste workshop, vamos explorar como **agentes de Inteligência Artificial** podem ser utilizados para acelerar e padronizar rotinas de bioinformática, com foco especial em análises genômicas (ex: *Bos taurus*).
+
+**O que você vai aprender:**
+
+::: {.incremental}
+- A **Pirâmide da Automação**: como estruturar Rules, Skills e Workflows.
+- Como explorar o ecossistema aberto (Google DeepMind, Anthropic, Comunidade).
+- Como o **MCP (Model Context Protocol)** e **Tools** conectam a IA a bancos de dados reais.
+- Na prática: A anatomia exata de como essas ferramentas são construídas para automatizar sua pesquisa.
+:::
+
+---
+
+## Nossa Meta Final 🎯
+
+> **Objetivo Prático:** Que você entenda profundamente **como funciona o ecossistema de agentes de IA** e seja capaz de extrair o melhor dessas ferramentas (Rules, Skills e Workflows) para potencializar as análises do seu projeto de pesquisa.
+
+---
+
+## Agenda {.smaller}
+
+::: {.roadmap .incremental}
+- ### A Pirâmide da Automação
+  Entendendo Rules, Skills e Workflows.
+- ### Explorando Skills existentes
+  Google DeepMind, Anthropic e a Comunidade.
+- ### MCP Servers e Tools
+  Conectando IA a bancos externos.
+- ### Hands-on: Bos taurus
+  Prática guiada extraindo dados genômicos.
+- ### Ecossistema na Prática
+  A anatomia de Rules, Skills e Workflows reais.
+- ### Discussão
+  Ideias de automatização para o seu projeto.
+:::
+
+---
+
+## O Problema Biológico 🧬 {.smaller}
+
+**Contexto:** Você está trabalhando no seu projeto e precisa investigar o gene **DGAT1** (*Diacylglycerol O-Acyltransferase 1*), associado à produção e teor de gordura do leite em bovinos.
+
+**O Desafio:**
+Você precisa extrair informações rápidas para enriquecer a discussão do seu artigo:
+
+::: {.incremental}
+1. Em qual cromossomo ele está e qual sua localização genômica exata?
+2. O que diz a literatura mais recente sobre variantes estruturais nesse gene?
+3. Quais são os principais parceiros de interação proteica (PPI)?
+4. Como obter rapidamente sua sequência FASTA para um alinhamento?
+:::
+
+---
+
+## Como Resolver Isso? 🕵️‍♂️ {.smaller}
+
+> 🤔 **Como você faria isso hoje?**
+>
+> * **Método Tradicional:** Abriria 4 sites diferentes (Ensembl, PubMed, STRING, UniProt), faria buscas manuais, copiaria e colaria os resultados...
+> * **Via Chat de IA Genérico (Prompting ingênuo):** Escreveria um prompt longo tentando guiar a IA, correndo o risco de **alucinações** (ex: sequências FASTA inventadas, scores STRING falsos ou dados de genomas antigos).
+>
+> **Vamos ver como um agente de IA, munido de Skills e Tools específicas, resolve isso com precisão científica e em segundos!**
+
+---
+
+# Bloco 1 {background-color="#1a1a2e"}
+
+## A Pirâmide da Automação
+
+```{mermaid}
+%%| eval: true
+%%| echo: false
+%%| fig-width: 10
+%%{init: {'theme': 'dark'}}%%
+flowchart TD
+    W[**Workflows**<br>Orquestram múltiplas Skills] --> S1[Skill A]
+    W --> S2[Skill B]
+    W --> S3[Skill C]
+    S1 -.-> R[**Rules**<br>Guiam o comportamento geral]
+    S2 -.-> R
+    S3 -.-> R
+```
+
+---
+
+## 1. Rules (A Constituição)
+
+* **O conceito:** Instruções globais que **sempre** estão ativas, independente da tarefa.
+* **Exemplos no Lab:**
+  - *"Sempre documente o código R gerado."*
+  - *"NUNCA sobrescreva arquivos brutos (`.fastq`), crie cópias."*
+* **Por que usar:** Garantem segurança e padrão básico, para não precisarmos repetir isso em cada skill específica.
+
+---
+
+## 2. Skills (As Tarefas)
+
+* **O conceito:** Uma "receita" focada em resolver **um problema específico**. É o bloco de Lego da automação.
+* **Exemplos no Lab:**
+  - `anotar_variantes.md` (Lê um VCF e anota contra o Ensembl).
+  - `gerar_volcano_plot.md` (Gera o gráfico a partir de uma tabela).
+* **Por que usar:** Garantem modularidade. Se o banco atualizar, você só altera a skill afetada.
+
+---
+
+## 3. Workflows (A Orquestração)
+
+* **O conceito:** O "maestro". Um workflow **não sabe** como fazer a tarefa técnica, mas sabe **a ordem** em que as Skills devem ser chamadas.
+* **Exemplos no Lab:**
+  - `pipeline_transcriptomica` (Baixar FASTQ $\rightarrow$ Qualidade $\rightarrow$ Alinhamento).
+* **Por que usar:** Garante reprodutibilidade de ponta a ponta. Você pede: "Rode o workflow de transcriptômica", e o agente resolve o resto.
+
+---
+
+## Voltando ao Foco: O que é uma Skill?
+
+> **Skill** é um "pacote de conhecimento estático". É o **manual de instruções** que ensina como resolver um problema.
+
+. . .
+
+### Skill vs. Agente de IA (O Motor)
+
+::: {.incremental}
+- 🤖 **O Agente (LLM)**: Sabe interpretar textos e programar, mas não conhece os pipelines do seu laboratório.
+- 📄 **A Skill**: **Não pensa**. Ela dita as regras e bibliotecas exatas que o Agente deve obedecer para não "alucinar".
+:::
+
+---
+
+## Por que precisamos de Skills?
+
+:::: {.columns}
+::: {.column width="50%"}
+### Sem skill
+
+::: {.incremental}
+- Digita o mesmo prompt toda vez
+- A IA não sabe suas preferências
+- Cada conversa começa do zero
+- Resultados inconsistentes
+:::
+:::
+
+::: {.column width="50%"}
+### Com skill
+
+::: {.incremental}
+- Instruções reutilizáveis
+- A IA conhece seu contexto
+- Comportamento padronizado
+- Resultados reprodutíveis
+:::
+:::
+::::
+
+---
+
+## A Anatomia da Skill (Receita de Bolo) 🎂
+
+```{mermaid}
+%%| eval: true
+%%| echo: false
+%%| fig-width: 10
+%%{init: {'theme': 'dark'}}%%
+flowchart LR
+    A["📄 SKILL.md<br>(A receita)"] --> B["🤖 Agente de IA<br>(O cozinheiro)"]
+    C["📁 scripts/<br>(Utensílios)"] --> B
+    D["📁 resources/<br>(Ingredientes)"] --> B
+    E["📁 examples/<br>(Fotos do resultado)"] --> B
+    B --> F["✅ Resultado<br>(O bolo pronto)"]
+```
+
+---
+
+## Estrutura de uma Skill
+
+```{.bash}
+minha-skill/
+├── SKILL.md          # 📄 Instruções principais (obrigatório)
+├── scripts/          # 🔧 Scripts auxiliares
+│   └── process.R
+├── resources/        # 📦 Dados, templates, referências
+│   └── reference.md
+├── examples/         # 💡 Exemplos de uso
+│   └── usage.md
+└── references/       # 📚 Documentação adicional
+    └── docs.md
+```
+
+. . .
+
+O único arquivo **obrigatório** é o `SKILL.md` — todo o resto é opcional.
+
+---
+
+## SKILL.md — O Coração da Skill
+
+```{.yaml}
+---
+name: bovine-variant-filter
+description: >
+  Filtra variantes genômicas de Bos taurus (ARS-UCD1.3)
+  aplicando critérios de qualidade padrão para SNPs e indels.
+---
+
+# Instruções
+
+Quando o usuário pedir para filtrar variantes bovinas:
+
+1. Leia o arquivo VCF usando `VariantAnnotation::readVcf()`
+2. Aplique os filtros:
+   - QUAL > 30
+   - DP > 10
+   - Remover variantes em regiões repetitivas
+3. Salve o VCF filtrado em `results/filtered/`
+4. Gere um relatório com estatísticas de filtragem
+```
+
+---
+
+## Por que isso importa para bioinformática?
+
+::: {.incremental}
+- 🔄 **Reprodutibilidade**: Mesma análise, mesmos parâmetros, sempre
+- 📏 **Padronização**: Todos no lab seguem o mesmo protocolo
+- ⚡ **Eficiência**: Não precisa re-explicar o contexto ao agente
+- 📖 **Documentação**: A skill É a documentação do método
+- 🔗 **Compartilhamento**: Publique e compartilhe com a comunidade
+:::
+
+---
+
+# Bloco 2 {background-color="#16213e"}
+
+## Explorando Skills Existentes
+
+---
+
+## Google DeepMind Science Skills
+
+Conjunto de skills open-source para ciência:
+
+```{.bash}
+npx -y skills add google-deepmind/science-skills/
+```
+
+. . .
+
+Isso instala skills para:
+
+| Skill | Função |
+|-------|--------|
+| `science-skills-common` | Utilitários compartilhados |
+| `string-database` | Interações proteína-proteína |
+| `uniprot-database` | Informações de proteínas |
+| `unibind-database` | Fatores de transcrição |
+| `ucsc-conservation-and-tfbs` | Conservação e TFBSs |
+| `workflow-skill-creator` | Criar novas skills |
+| `uv` | Gerenciamento de ambientes Python |
+
+---
+
+## Exemplo: UniProt Database Skill
+
+```{.yaml}
+---
+name: uniprot-database
+description: >
+  Query the UniProt protein database for protein
+  information, sequences, and functional annotations.
+---
+```
+
+. . .
+
+Essa skill ensina a IA a:
+
+1. Buscar proteínas por nome, gene ou organismo
+2. Extrair sequências em formato FASTA
+3. Obter anotações funcionais (GO terms, domínios)
+4. Filtrar por organismo (*Bos taurus* = taxon 9913)
+
+---
+
+## Exemplo: STRING Database Skill
+
+A skill de STRING permite ao agente:
+
+```r
+# O agente sabe fazer isso graças à skill:
+# 1. Buscar interações para um gene bovino
+# 2. Construir rede de interação
+# 3. Visualizar com igraph
+
+# Basta pedir:
+# "Mostre a rede de interações do gene DGAT1
+#  em Bos taurus usando STRING"
+```
+
+. . .
+
+Sem a skill, você teria que explicar a API do STRING, o taxon ID, os parâmetros...
+
+---
+
+## 🔍 Exercício: Explore uma skill
+
+**5 minutos**: Abra o terminal e explore a estrutura de uma skill instalada:
+
+```{.bash}
+# Navegue até as skills instaladas
+ls .agents/skills/
+
+# Escolha uma e explore
+cat .agents/skills/uniprot-database/SKILL.md
+```
+
+**Perguntas para refletir:**
+
+- Quais seções o SKILL.md tem?
+- Existem scripts auxiliares?
+- Como as instruções são organizadas?
+
+---
+
+## Explorando Plataformas: Anthropic
+
+A Anthropic também mantém excelentes automações, com destaque para a delegação de tarefas de computador.
+
+. . .
+
+### A Meta-Skill: `skill-creator`
+
+A automação mais poderosa deles é uma skill que **cria outras skills**. 
+
+Você pede *"Crie uma skill para rodar o FastQC"*, e o agente autonomamente:
+1. Lê a documentação oficial da ferramenta.
+2. Escreve um arquivo `SKILL.md` perfeito, seguindo as melhores práticas.
+3. Salva no seu diretório para uso futuro.
+
+---
+
+## A Comunidade: skill.sh 🌐
+
+Além dos pacotes oficiais, a comunidade compartilha diversas automações no site **[skill.sh](https://skill.sh)**. É um ótimo lugar para buscar inspiração!
+
+. . .
+
+::: {.callout-warning icon=true title="🚨 Cuidado Constante: Prompt Injections"}
+**Nunca execute uma skill cegamente!** Leia o arquivo `SKILL.md` antes de usá-lo.
+
+Como as skills são interpretadas por agentes que têm acesso aos seus arquivos (tools), *prompt injections* maliciosos podem ser escritos para vazar dados sensíveis do seu laboratório ou rodar comandos não autorizados no seu terminal. **Audite sempre!**
+:::
+
+---
+
+# Bloco 3 {background-color="#0f3460"}
+
+## MCP Servers e Tools
+
+---
+
+## O que é o MCP?
+
+**Model Context Protocol (MCP)** é um padrão aberto que permite que agentes de IA se conectem de forma segura a fontes de dados externas.
+
+. . .
+
+Em vez do agente "alucinar" dados ou você ter que copiar e colar textos para ele, o MCP fornece **Tools** (ferramentas) para ele buscar a verdade.
+
+---
+
+## Diferença: Skill vs Tool
+
+:::: {.columns}
+::: {.column width="50%"}
+### 📄 Skill
+- É o manual de instruções (texto).
+- Ensina **o que** fazer e **como** formatar.
+- Vive no seu projeto (`.agents/skills/`).
+:::
+
+::: {.column width="50%"}
+### 🛠️ Tool (MCP)
+- É a ferramenta real (código/API).
+- Executa ações reais (buscar no banco, rodar bash, ler arquivo).
+- Vive no servidor MCP.
+:::
+::::
+
+. . .
+
+> 💡 **Analogia**: A Skill é a receita do bolo. A Tool é a batedeira e o forno.
+
+---
+
+# Bloco 4 {background-color="#533483"}
+
+## Hands-on: Buscando Dados de *Bos taurus*
+
+---
+
+## Exercício 1: Busca de Gene
+
+Abra o Antigravity e peça ao agente:
+
+> "Use o gget para buscar informações do gene **DGAT1** em *Bos taurus*. Me diga: em qual cromossomo está, quantos transcritos tem, e qual a sua função principal."
+
+. . .
+
+**O que observar:**
+
+::: {.incremental}
+- O agente escolheu a ferramenta correta?
+- A informação retornada é precisa?
+- Como você validaria isso?
+:::
+
+---
+
+## Exercício 2: Busca de Artigos
+
+Peça ao agente:
+
+> "Busque no PubMed os 5 artigos mais recentes sobre **structural variants in Bos taurus**. Liste título, autores e ano."
+
+. . .
+
+**Dica de validação**: Abra o PubMed no navegador e compare os resultados.
+
+---
+
+## Exercício 3: Interações Proteicas
+
+Peça ao agente:
+
+> "Quais são as 10 principais proteínas que interagem com DGAT1 em bovinos segundo o STRING database? Qual o score de confiança de cada interação?"
+
+. . .
+
+**Reflexão**: O agente usou uma skill, um tool, ou ambos?
+
+---
+
+## Exercício 4: Sequência
+
+Peça ao agente:
+
+> "Obtenha a sequência de aminoácidos da proteína DGAT1 bovina do UniProt em formato FASTA. Salve em um arquivo `data/sample/DGAT1_bos_taurus.fasta`."
+
+---
+
+# Bloco 5 {background-color="#e94560"}
+
+## Ecossistema na Prática 
+
+---
+
+## 1. Exemplo de Rule
+
+Rules são a constituição do seu laboratório. Salve-as no ambiente do agente e ele **nunca** as esquecerá:
+
+```{.markdown}
+# Regra de Segurança: Bioinformática
+# Arquivo: rule-bioinfo-safety.md
+
+Quando você for analisar arquivos brutos ou escrever códigos R:
+
+- **NUNCA** apague os arquivos `.fastq` ou `.vcf` originais.
+- Sempre crie uma cópia na pasta `data/processed/` antes de filtrar.
+- Ao gerar gráficos em R, use sempre o pacote `ggplot2` com `theme_minimal()`.
+- Responda de forma direta e científica, sem jargões.
+```
+
+---
+
+## 2. Anatomia Detalhada do SKILL.md
+
+---
+
+## Frontmatter YAML
+
+A seção entre `---` no topo do arquivo:
+
+```{.yaml}
+---
+name: nome-da-skill
+description: >
+  Uma descrição clara e concisa do que a skill faz.
+  Pode ter múltiplas linhas.
+---
+```
+
+. . .
+
+| Campo | Obrigatório | Descrição |
+|-------|:-----------:|-----------|
+| `name` | ✅ | Identificador único da skill |
+| `description` | ✅ | O que a skill faz (o agente lê isso primeiro) |
+
+---
+
+## Corpo do SKILL.md
+
+O corpo usa **Markdown** com instruções claras para o agente:
+
+```{.markdown}
+# Instruções
+
+## Quando usar esta skill
+- Quando o usuário pedir para [ação específica]
+- Quando o contexto envolver [domínio específico]
+
+## Como executar
+1. Primeiro, [passo 1]
+2. Depois, [passo 2]
+3. Finalmente, [passo 3]
+
+## Regras importantes
+- SEMPRE usar [parâmetro X]
+- NUNCA fazer [ação perigosa]
+- Verificar [condição] antes de prosseguir
+```
+
+---
+
+## Boas Práticas para Escrever Skills
+
+::: {.incremental}
+1. **Seja específico** — "Use `VariantAnnotation::readVcf()`" > "Leia o VCF"
+2. **Dê exemplos** — Inclua inputs e outputs esperados
+3. **Defina limites** — O que a skill NÃO deve fazer
+4. **Use listas numeradas** — Passos sequenciais claros
+5. **Inclua validação** — Como verificar se deu certo
+6. **Documente parâmetros** — Genoma, versão, thresholds
+:::
+
+---
+
+## Exemplo Completo: Skill para Bovinos
+
+```{.yaml}
+---
+name: bovine-variant-annotator
+description: >
+  Anota variantes genômicas de Bos taurus usando
+  o genoma de referência ARS-UCD1.3 e banco Ensembl.
+---
+
+# Instruções
+
+## Contexto
+- Organismo: Bos taurus
+- Genoma: ARS-UCD1.3 (GCF_002263795.3)
+- Banco: Ensembl release 112
+
+## Etapas
+1. Ler VCF com `VariantAnnotation::readVcf()`
+2. Anotar contra TxDb do Ensembl para Bos taurus
+3. Classificar: intergênica, intrônica, exônica,
+   sinônima, missense, nonsense
+4. Gerar tabela resumo com contagens por categoria
+5. Salvar resultado em `results/annotated_variants.tsv`
+
+## Validação
+- Verificar que total de variantes anotadas =
+  total de variantes no VCF original
+- Reportar % de variantes em cada categoria
+```
+
+---
+
+## 3. Exemplo de Workflow
+
+Workflows delegam. Eles orquestram as Skills na ordem correta para garantir reprodutibilidade total:
+
+```{.markdown}
+# Pipeline de Análise de Variantes Bovinas
+# Arquivo: workflow-variantes.md
+
+## Objetivo
+Processar VCFs brutos de *Bos taurus* até gerar estatísticas finais.
+
+## Etapas do Workflow
+1. Use a skill `bovine-variant-filter` para limpar o VCF bruto localizado em `data/raw/`.
+2. Após o filtro, passe o VCF limpo para a skill `bovine-variant-annotator`.
+3. Finalmente, peça à tool do `R` para gerar um barplot com o arquivo `.tsv` resultante, salvando em `results/plots/`.
+```
+
+---
+
+# Bloco 6 {background-color="#1a1a2e"}
+
+## 💬 Discussão: Ideias de Skills
+
+---
+
+## Brainstorm
+
+Pensem em tarefas que vocês fazem **repetidamente** no lab:
+
+::: {.incremental}
+- 📊 Filtragem de variantes com os mesmos critérios?
+- 🧬 Anotação funcional sempre no mesmo banco?
+- 📈 Mesmo tipo de gráfico para diferentes datasets?
+- 📋 Relatório com o mesmo formato toda vez?
+- 🔄 Pipeline que roda os mesmos passos?
+:::
+
+---
+
+## Mão na Massa 🚀
+
+> **Exercício**: Escreva 2-3 ideias de skills que seriam úteis para seu projeto. No **próximo workshop**, vamos implementar uma delas!
+
+---
+
+## Para o próximo workshop (WS2)
+
+:::: {.columns}
+::: {.column width="60%"}
+### Trazer preparado
+::: {.incremental}
+- 2-3 ideias de skills para seu projeto
+- Um script R que você usa frequentemente
+- Acesso ao Antigravity configurado
+:::
+:::
+
+::: {.column width="40%"}
+### Vamos fazer
+::: {.incremental}
+- Criar uma skill do zero
+- Testar e iterar
+- Compartilhar no GitHub
+:::
+:::
+::::
+
+---
+
+## Resumo do Workshop
+
+| Conceito | O que aprendemos |
+|----------|-----------------|
+| **Skill** | Instruções reutilizáveis para o agente |
+| **SKILL.md** | Arquivo principal com frontmatter YAML + instruções |
+| **MCP/Tools** | Ferramentas que o agente pode executar |
+| **Relação** | Skills instruem o agente sobre como/quando usar tools |
+
+---
+
+## A Grande Mensagem 🎯
+
+> **Takeaway**: Skills são a ponte entre o **conhecimento do especialista** (você) e a **capacidade de execução** da IA.
+
+---
+
+## Obrigada! {.center}
+
+### 📂 Material
+
+[github.com/cgf-esalq/bioinfo-ai-skills](https://github.com/cgf-esalq/bioinfo-ai-skills)
+
+### 📧 Dúvidas?
+
+Abra uma issue no repositório ou fale com [@cavalheiromf](https://github.com/cavalheiromf)

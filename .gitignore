@@ -1,0 +1,36 @@
+# Data files (too large for git)
+data/raw/
+data/processed/
+*.vcf.gz
+*.bam
+*.sam
+*.fastq.gz
+
+# R
+.Rhistory
+.Rdata
+.RData
+.Rproj.user/
+*.Rproj
+
+# Quarto
+_site/
+_freeze/
+.quarto/
+*_files/
+*.html
+
+# Agent
+.agents/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+.Renviron
