@@ -1,4 +1,4 @@
-# 🧬 bioinfo-ai-skills
+# 🧬 Bioinfo Agentica
 
 **Workshop de IA Responsável para Bioinformática Genômica**
 
