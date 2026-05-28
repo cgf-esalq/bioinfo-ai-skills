@@ -1,6 +1,6 @@
 ---
-title: "Anatomia de uma Skill e o Ecossistema de Tools"
-subtitle: "Workshop 1 — Bioinfo Agentica"
+title: "Agentes de IA na Pesquisa: Construindo Rules, Skills e Workflows"
+subtitle: "Workshop 1 — bioinfo-ai-skills"
 author: "CGF-ESALQ"
 date: today
 format:
@@ -11,7 +11,7 @@ format:
     transition: fade
     code-line-numbers: true
     highlight-style: github
-    footer: "🧬 Bioinfo Agentica | WS1 — Anatomia de Skills"
+    footer: "🧬 bioinfo-ai-skills | WS1 — Anatomia de Skills"
     logo: ""
     embed-resources: true
 execute:
