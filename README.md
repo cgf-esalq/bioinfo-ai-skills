@@ -23,8 +23,6 @@ Material de apoio para uma série de workshops práticos ensinando alunos de pó
 |----------|------|--------|
 | WS1 | [Anatomia de Skills e Ecossistema de Tools](workshops/01-anatomia-skills/) | 🔜 Próximo |
 | WS2 | [Criando sua Primeira Skill](workshops/02-criando-skills/) | ⏳ Planejado |
-| WS3 | [Pipeline de Análise de Variantes com IA](workshops/03-pipeline-variantes/) | ⏳ Planejado |
-| WS4 | [eQTLs, Reprodutibilidade e Boas Práticas](workshops/04-eqtl-boas-praticas/) | ⏳ Planejado |
 
 > **Nota:** Este curso assume conhecimento básico de Git/GitHub e do funcionamento básico de LLMs.
 
@@ -52,12 +50,12 @@ cd bioinfo-ai-skills
 bioinfo-ai-skills/
 ├── workshops/           # Material de cada workshop (slides, exercícios)
 │   ├── 01-anatomia-skills/
-│   ├── 02-criando-skills/
-│   ├── 03-pipeline-variantes/
-│   └── 04-eqtl-boas-praticas/
+│   └── 02-criando-skills/
+├── rules/               # "Constituições" globais de segurança e estilo
+├── skills/              # Skills de referência modulares
+├── workflows/           # Pipelines orquestrando múltiplas skills
 ├── data/                # Dados de exemplo para exercícios
 │   └── sample/
-├── skills/              # Skills de referência criadas durante o curso
 ├── resources/           # Guias, cheatsheets e referências
 └── LICENSE              # CC-BY-4.0
 ```
